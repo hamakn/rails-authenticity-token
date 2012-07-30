@@ -40,6 +40,8 @@ class UsersController < ApplicationController
   # POST /users
   # POST /users.json
   def create
+    return render :json => "{error: no_session_id}", :status => 400 unless session[:id]
+
     @user = User.new(params[:user])
 
     respond_to do |format|
