@@ -1,5 +1,6 @@
 Apitest::Application.routes.draw do
   resources :users
+  get 'authenticity_token' => 'authenticity_token#show'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
