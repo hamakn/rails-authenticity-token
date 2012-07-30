@@ -1,0 +1,74 @@
+h1. Authenticity Token Rails Sample
+
+h2. from curl
+
+h3. sessionがなければ、400
+
+* クライアント
+
+<pre>
+$ curl -d "user[name]=hoge" http://localhost:3000/users.json
+{error: no_session_id}
+</pre>
+
+* サーバログ
+
+<pre>
+WARNING: Can't verify CSRF token authenticity
+</pre>
+
+h3. sessionがあっても、authenticity_tokenがなければ、400
+
+* クライアント
+
+<pre>
+$ curl -c cookie.txt http://localhost:3000/authenticity_token
+$ curl -b cookie.txt -d "user[name]=hoge" http://localhost:3000/users.json
+{error: no_session_id}
+</pre>
+
+* サーバログ
+
+<pre>
+WARNING: Can't verify CSRF token authenticity
+</pre>
+
+h3. sessionがあって、authenticity_tokenもあれば、200
+
+* http header渡し
+
+<pre>
+$ curl -c cookie.txt http://localhost:3000/authenticity_token
+kB4d3xz2PGUMDqQrFeljBAKz9++zjODup8Ti20waX54=
+$ curl -b cookie.txt -d "user[name]=hoge" -H "X-CSRF-Token: kB4d3xz2PGUMDqQrFeljBAKz9++zjODup8Ti20waX54=" http://localhost:3000/users.json
+{"created_at":"2012-07-30T17:20:18Z","id":34,"name":"hoge","updated_at":"2012-07-30T17:20:18Z"}
+</pre>
+
+* パラメータ渡し
+
+<pre>
+$ curl -c cookie.txt http://localhost:3000/authenticity_token
+vopTh7/Y+QctXbw9EdWzv6Yu9qBHNz/zI6ak6UzEwTI=
+# encodeが必要
+$ curl -b cookie.txt -d "user[name]=hoge" -d "authenticity_token=vopTh7%2FY%2BQctXbw9EdWzv6Yu9qBHNz%2FzI6ak6UzEwTI%3D" http://localhost:3000/users.json
+{"created_at":"2012-07-30T17:08:27Z","id":32,"name":"hoge","updated_at":"2012-07-30T17:08:27Z"}
+</pre>
+
+h2. from web page
+
+* まだ作っていない
+
+h3. scaffoldで作った /users/new
+
+* 200が返る(当然)
+
+h3. authenticity_tokenを考慮しないhtml
+
+* $ open http://localhost:3000/post_without_authenticity_token.html
+* 400が返る
+
+h3. authenticity_tokenを考慮したhtml
+
+* $ open http://localhost:3000/post_with_authenticity_token.html
+* 200が返る
+
